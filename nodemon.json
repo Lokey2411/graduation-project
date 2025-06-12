@@ -1,0 +1,6 @@
+{
+	"watch": ["src"],
+	"ext": "ts,json",
+	"ignore": ["node_modules", "dist"],
+	"exec": "kill-port 8000 && node -r tsconfig-paths/register -r ts-node/register src/index.ts"
+}

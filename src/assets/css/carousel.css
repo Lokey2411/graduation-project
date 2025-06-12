@@ -1,0 +1,28 @@
+.slick-arrow {
+	width: auto !important;
+	height: auto !important;
+}
+
+.ant-carousel .slick-prev::after,
+.ant-carousel .slick-next::after {
+	content: unset;
+}
+
+.slick-track {
+	display: flex;
+	gap: 24px;
+}
+
+.slick-prev {
+	right: calc(100% + 40px);
+	inset-inline-start: unset;
+}
+
+.slick-next {
+	left: calc(100% + 40px);
+	inset-inline-end: unset;
+}
+
+.slick-item {
+	display: grid !important;
+}

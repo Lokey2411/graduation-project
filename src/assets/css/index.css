@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+* These styles were added to improve the appearance of the example pages.
+* It is safe to delete them, and they are not intended to be used by Refine components.
+*/
+@layer base {
+}
+* {
+	transition: all 0.2s ease-in-out;
+}
+
+.ant-upload-wrapper > .ant-upload {
+	width: 100%;
+}
+
+.ant-upload > .ant-upload {
+	width: 100%;
+	padding: 12px;
+	height: auto !important;
+	display: block !important;
+	border: 1px dashed #fff;
+	border-radius: 8px;
+}
+
+.ant-form-item-control-input {
+	min-height: unset;
+}
+
+.ant-select-dropdown {
+	right: 48px !important;
+	left: auto !important;
+}

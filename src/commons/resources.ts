@@ -11,12 +11,16 @@ export const resources = [
 			canDelete: true,
 		},
 	})),
-	/**
-	 * list: categories: api: GET /categories
-	 * create: categories/create -> api: POST /categories
-	 * edit: categories/edit/:id -> api: PUT /categories/:id
-	 * show: categories/show/:id -> api: GET /categories/:id
-	 */
+	{
+		name: 'chat_messages',
+		list: '/chat_messages',
+		show: '/chat_messages/show/:id',
+	},
+	{
+		name: 'documents',
+		create: '/documents/create',
+		list: '/documents',
+	},
 	{
 		name: 'variants',
 		create: '/variants/create',

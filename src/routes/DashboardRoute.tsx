@@ -9,6 +9,8 @@ import { ProductCreate, ProductEdit, ProductList, ProductShow } from '@/pages/pr
 import { VariantCreate, VariantEdit } from '@/pages/variants'
 import { ImageCreate } from '@/pages/images'
 import { OrderList, OrderShow } from '@/pages/orders'
+import { ChatList, ChatShow } from '@/pages/chat_messages'
+import { DocumentCreate, DocumentList } from '@/pages/documents'
 
 const DashboardRoute = () => {
 	return (
@@ -50,6 +52,14 @@ const DashboardRoute = () => {
 				<Route path='/orders'>
 					<Route index element={<OrderList />} />
 					<Route path='show/:id' element={<OrderShow />} />
+				</Route>
+				<Route path='/chat_messages'>
+					<Route index element={<ChatList />} />
+					<Route path='show/:id' element={<ChatShow />} />
+				</Route>
+				<Route path='/documents'>
+					<Route index element={<DocumentList />} />
+					<Route path='create' element={<DocumentCreate />} />
 				</Route>
 				<Route path='*' element={<ErrorComponent />} />
 			</Route>

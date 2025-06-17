@@ -1,19 +1,20 @@
 import { MAX_PRODUCT_IMAGE_COUNT } from '@/commons/constants'
 import BooleanField from '@/components/BooleanField'
 import DeleteButton from '@/components/DeleteButton'
-import { DoubleRightOutlined, FileImageOutlined } from '@ant-design/icons'
+import { DoubleRightOutlined, FileImageOutlined, SyncOutlined } from '@ant-design/icons'
 import { CreateButton, Edit, EditButton, useForm, useSelect } from '@refinedev/antd'
-import { BaseRecord } from '@refinedev/core'
+import { BaseRecord, useCreate, useDelete, useList } from '@refinedev/core'
 import { axiosInstance } from '@refinedev/simple-rest'
-import { Button, Flex, Form, Image, Input, InputNumber, Modal, Select, Space, Table } from 'antd'
+import { Button, Flex, Form, Image, Input, InputNumber, Modal, Select, Space, Switch, Table } from 'antd'
 import FormItemLabel from 'antd/es/form/FormItemLabel'
 import TextArea from 'antd/es/input/TextArea'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 
 export const ProductEdit = () => {
 	const { formProps, saveButtonProps } = useForm({})
 	const [modal, setModal] = useState('')
+	const [priorities, setPriorities] = useState({} as { [key: number]: number })
 	const { selectProps } = useSelect({
 		resource: 'categories',
 		optionLabel: 'name',
@@ -21,6 +22,17 @@ export const ProductEdit = () => {
 		defaultValue: formProps?.form?.getFieldValue('category_id'),
 	})
 	const { id } = useParams()
+	const { data: allProducts } = useList({
+		resource: '/products',
+	})
+	const { data: relatedProducts } = useList({
+		resource: `/products/${id}/related-products`,
+	})
+	const { mutate: addRelatedProductMutation } = useCreate({
+		resource: `/products/${id}/related-products`,
+		successNotification: { description: 'Success', message: 'Add related product successfully', type: 'success' },
+	})
+	const { mutate: removeRelatedProductMutation } = useDelete()
 	const [variants, setVariants] = useState([])
 	const [images, setImages] = useState<string[]>([])
 	useEffect(() => {
@@ -31,6 +43,36 @@ export const ProductEdit = () => {
 			setImages(res.data)
 		})
 	}, [])
+
+	useEffect(() => {
+		if (allProducts?.data && Array.isArray(allProducts.data)) {
+			const newPriorities = {} as { [key: number]: number }
+			allProducts.data.forEach(product => {
+				const relatedProduct = relatedProducts?.data?.find(rp => rp.id === product.id)
+				if (product.id) newPriorities[+product.id] = relatedProduct?.priority ?? -1
+			})
+			setPriorities(newPriorities)
+		}
+	}, [allProducts])
+
+	const toggleRelatedProduct = (checked: boolean, id: number) => {
+		if (
+			checked // NOSONAR
+		) {
+			addRelatedProductMutation({
+				values: {
+					related_product_id: id,
+					priority: priorities[id],
+				},
+			})
+		} else {
+			removeRelatedProductMutation({
+				resource: 'products/' + id + '/related-products',
+				id,
+			})
+		}
+	}
+
 	return (
 		<Edit
 			saveButtonProps={saveButtonProps}
@@ -38,6 +80,9 @@ export const ProductEdit = () => {
 				return (
 					<>
 						{defaultButtons}
+						<Button type='primary' onClick={() => setModal('related')} icon={<SyncOutlined />}>
+							Related products
+						</Button>
 						<Button
 							type='primary'
 							onClick={() => {
@@ -52,6 +97,34 @@ export const ProductEdit = () => {
 					</>
 				)
 			}}>
+			<Modal open={modal === 'related'} onCancel={() => setModal('')} title='Related products'>
+				<div className='grid grid-cols-2 gap-x-3 gap-y-4'>
+					{Array.isArray(allProducts?.data) &&
+						allProducts.data.map(product => {
+							const isRelated = relatedProducts?.data?.some(p => p.id === product.id) // find(p => p.product_id === product.id)
+							return (
+								<React.Fragment key={product.id ?? 0}>
+									<div className='col-span-1 flex gap-2 items-center'>
+										<FormItemLabel prefixCls='' label={product.name}></FormItemLabel>
+										<Switch
+											className='flex-1'
+											defaultChecked={isRelated}
+											onChange={checked => toggleRelatedProduct(checked, product.id ? +product.id : 0)}
+										/>
+									</div>
+									<div className='flex gap-2 items-center'>
+										<FormItemLabel prefixCls='' label='Priority'></FormItemLabel>
+										<InputNumber
+											disabled={isRelated}
+											defaultValue={priorities[product.id ? +product.id : 0] ?? -1}
+											onChange={value => (priorities[product.id ? +product.id : 0] = value ?? -1)}
+										/>
+									</div>
+								</React.Fragment>
+							)
+						})}
+				</div>
+			</Modal>
 			<Modal open={modal === 'image'} onCancel={() => setModal('')} title='Image'>
 				<div className='flex justify-end items-center my-2 gap-4'>
 					{/* length */}

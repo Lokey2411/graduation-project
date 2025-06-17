@@ -18,6 +18,7 @@ const config: Config = {
 				'to-left': 'to-left 0.3s ease-out forwards',
 				'to-right': 'to-right 0.3s ease-out forwards',
 				'scaleX': 'scaleX 0.3s ease-out forwards',
+				'texting': 'texting 2s steps(12, end) alternate',
 			},
 			keyframes: {
 				'fly-in': {
@@ -47,6 +48,10 @@ const config: Config = {
 				'scaleX': {
 					'0%': { transform: 'scaleX(0)' },
 					'100%': { transform: 'scaleX(1)' },
+				},
+				'texting': {
+					'0%': { clipPath: 'inset(0 100% 0 0)' },
+					'100%': { clipPath: 'inset(0 0 0 0)' },
 				},
 			},
 			colors: {

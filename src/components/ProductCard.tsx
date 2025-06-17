@@ -9,9 +9,17 @@ import { Link } from 'react-router-dom';
 type Props = IProduct;
 
 const ProductCard = (product: Props) => {
-	const { data: images } = useGet(async () => await ProductService.getProductImages(product.id));
-	const { data: category } = useGet(async () => await ProductService.getProductCategory(product.id));
+	const fetchProductData = async () => {
+		const [images, category] = await Promise.all([
+			ProductService.getProductImages(product.id),
+			ProductService.getProductCategory(product.id),
+		]);
+		return { images, category };
+	};
 
+	const {
+		data: { images, category },
+	} = useGet(fetchProductData);
 	return (
 		<Link
 			to={`/products/${product.id}`}

@@ -9,8 +9,18 @@ import { Link, useParams } from 'react-router-dom';
 
 export default function CategoryPage() {
 	const { id } = useParams();
-	const { data: products } = useGet<IProduct[]>(async () => await CategoryService.getProducts(id ? +id : 0));
-	const { data: category } = useGet<ICategory>(async () => await CategoryService.getCategory(id ? +id : 0));
+	const fetchCategoryData = async (id: string | undefined) => {
+		const categoryId = id ? +id : 0;
+		const [products, category] = await Promise.all([
+			CategoryService.getProducts(categoryId),
+			CategoryService.getCategory(categoryId),
+		]);
+		return { products, category };
+	};
+
+	const {
+		data: { products, category },
+	} = useGet<{ products: IProduct[]; category: ICategory }>(async () => await fetchCategoryData(id));
 	if (!id || !category || !products || !Array.isArray(products)) return <NotFound />;
 	return (
 		<div className='flex flex-col gap-20 my-20'>

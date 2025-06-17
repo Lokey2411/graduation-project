@@ -19,11 +19,25 @@ export default function ProductDetailPage() {
 	const { id: productId } = useParams();
 	const id = productId ? +productId : -11;
 	const notification = useNotification();
-	const { data: productDetail } = useGet<IProduct>(async () => await ProductService.getProductById(+id));
-	const { data: images } = useGet<string[]>(async () => await ProductService.getProductImages(+id));
-	const { data: relatedProducts } = useGet(async () => await ProductService.getRelatedProducts(+id));
-	const { data: variants } = useGet<IVariant[]>(
-		async () => await ProductService.getProductVariants(+id),
+	const fetchProductData = async (id: number) => {
+		const [productDetail, images, relatedProducts, variants] = await Promise.all([
+			ProductService.getProductById(id),
+			ProductService.getProductImages(id),
+			ProductService.getRelatedProducts(id),
+			ProductService.getProductVariants(id),
+		]);
+		return { productDetail, images, relatedProducts, variants };
+	};
+
+	const {
+		data: { productDetail, images, relatedProducts, variants },
+	} = useGet<{
+		productDetail: IProduct;
+		images: string[];
+		relatedProducts: IProduct[];
+		variants: IVariant[];
+	}>(
+		async () => await fetchProductData(id),
 		error => {
 			notification.error({ message: 'Error', description: error.message });
 		},

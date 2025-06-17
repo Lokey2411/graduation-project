@@ -8,8 +8,14 @@ import { useEffect, useState } from 'react';
 export default function OrdersPage() {
 	// get query string
 	const { search } = useLocation();
-	const { data: orders } = useGet(async () => await UserService.getOrdres(search));
-	const { data: addresses } = useGet<any[]>(UserService.getAddresses);
+	const fetchUserData = async (search: string) => {
+		const [orders, addresses] = await Promise.all([UserService.getOrdres(search), UserService.getAddresses()]);
+		return { orders, addresses };
+	};
+
+	const {
+		data: { orders, addresses },
+	} = useGet<{ orders: any[]; addresses: any[] }>(async () => await fetchUserData(search));
 	const [dataSource, setDataSource] = useState<any[]>([]);
 	const defaultFilters = {
 		address: '',

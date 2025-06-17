@@ -140,3 +140,16 @@ CREATE TABLE
         FOREIGN KEY (order_id) REFERENCES orders (id),
         FOREIGN KEY (variant_id) REFERENCES variants (id)
     );
+
+CREATE TABLE
+    chat_messages (
+        id INT NOT NULL AUTO_INCREMENT,
+        question TEXT NOT NULL,
+        answer TEXT NOT NULL,
+        sessionId VARCHAR(36) DEFAULT NULL,
+        user_id INT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        isDelete BOOLEAN DEFAULT FALSE,
+        PRIMARY KEY (id),
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    )

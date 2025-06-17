@@ -6,10 +6,12 @@ import { Request, Response } from 'express'
 const checkForeign = async (productId: number, variantId: number) => {
 	const productSql = `SELECT * FROM products WHERE id = ? AND isDelete = false LIMIT 1`
 	const productValues = [productId]
-	const [products] = await (await connection).query(productSql, productValues)
 	const variantSql = `SELECT * FROM variants WHERE id = ? AND isDelete = false LIMIT 1`
 	const variantValues = [variantId]
-	const [variants] = await (await connection).query(variantSql, variantValues)
+	const [[products], [variants]] = await Promise.all([
+		(await connection).query(productSql, productValues),
+		(await connection).query(variantSql, variantValues),
+	])
 	const isArray = (variable: any): variable is any[] => Array.isArray(variable) && variable.length > 0
 	const isValidForeign = isArray(products) && isArray(variants)
 	return isValidForeign
@@ -120,16 +122,13 @@ export const cartProduct = async (req: Request, res: Response) => {
 			return res.status(STATUS.BAD_REQUEST).json(inputError)
 		}
 
-		const isValidData = await checkForeign(product_id, variant_id)
+		const [isValidData, orderId] = await Promise.all([
+			checkForeign(product_id, variant_id),
+			getOrCreateOrderId(userId, price),
+		])
+
 		if (!isValidData) {
 			return res.status(STATUS.NOT_FOUND).json('Product or variant is not exist')
-		}
-
-		let orderId: number
-		try {
-			orderId = await getOrCreateOrderId(userId, price)
-		} catch {
-			return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Internal Server Error')
 		}
 		const updateOrInsertError = await updateOrInsertProductInCart(
 			orderId,
@@ -140,7 +139,6 @@ export const cartProduct = async (req: Request, res: Response) => {
 			req.body.quantity,
 			res,
 		)
-		console.log('updateOrInsertError: ', updateOrInsertError)
 		if (updateOrInsertError) return updateOrInsertError
 
 		return res.status(STATUS.OK).json('Add to cart successfully')
@@ -168,14 +166,20 @@ export const updateOrderQuantity = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params
 		const { quantity, price, product_id } = req.body
-		const sql = `UPDATE product_orders SET quantity = ? WHERE order_id = ? AND product_id = ?`
-		const values = [quantity, id, product_id]
-		const [result] = await (await connection).query(sql, values)
-		let affectedRows = 'affectedRows' in result ? result.affectedRows : 0
-		const [updateOrderResult] = await (await connection).query(`UPDATE orders SET price = ? WHERE id = ?`, [price, id])
-		if ('affectedRows' in updateOrderResult) {
-			affectedRows += updateOrderResult.affectedRows
-		}
+		const [productResult, orderResult] = await Promise.all([
+			(
+				await connection
+			).query(`UPDATE product_orders SET quantity = ? WHERE order_id = ? AND product_id = ?`, [
+				quantity,
+				id,
+				product_id,
+			]),
+			(await connection).query(`UPDATE orders SET price = ? WHERE id = ?`, [price, id]),
+		])
+		const [productUpdate, orderUpdate] = [productResult[0], orderResult[0]]
+		const affectedRows =
+			('affectedRows' in productUpdate ? productUpdate.affectedRows : 0) +
+			('affectedRows' in orderUpdate ? orderUpdate.affectedRows : 0)
 		return res.status(STATUS.OK).json({ affectedRows })
 	} catch (error) {
 		console.error('Error update order quantity', error)
@@ -202,13 +206,13 @@ export const checkoutCart = async (req: Request, res: Response) => {
 		const { id } = req.params
 		const status = PRODUCT_ORDERS_STATUS.CHECKOUT
 		const { price, address } = req.body
-		// check if order is checkout
-		const sql = `UPDATE product_orders SET status = ? WHERE order_id = ?`
-		const values = [status, id]
-		const [result] = await (await connection).query(sql, values)
-		const [updateOrderResult] = await (
-			await connection
-		).query(`UPDATE orders SET price = ?, orderDate = ?, address = ? WHERE id = ?`, [price, new Date(), address, id])
+		const [productResult, orderResult] = await Promise.all([
+			(await connection).query(`UPDATE product_orders SET status = ? WHERE order_id = ?`, [status, id]),
+			(
+				await connection
+			).query(`UPDATE orders SET price = ?, orderDate = ?, address = ? WHERE id = ?`, [price, new Date(), address, id]),
+		])
+		const [result, updateOrderResult] = [productResult[0], orderResult[0]]
 		return res.status(STATUS.OK).json({ result, updateOrderResult })
 	} catch (error) {
 		console.error('Error checkout cart', error)

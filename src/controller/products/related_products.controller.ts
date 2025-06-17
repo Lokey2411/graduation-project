@@ -13,16 +13,22 @@ export const getRelatedProducts = async (req: Request, res: Response) => {
 			return res.status(STATUS.BAD_REQUEST).json('ID is required')
 		}
 		const sql = `SELECT DISTINCT 
-		p2.* 
+		p2.*,
+		r_p.priority,
+		r_p.related_product_id
 		FROM products p1 
 		JOIN products p2 
 		JOIN related_products r_p 
 		ON p1.id = r_p.product_id 
 		AND p2.id = r_p.related_product_id 
-		WHERE p1.id = ? 
+		WHERE p1.id = ?  AND
+		p2.isDelete = false AND
+		r_p.isDelete = false AND
+		p1.isDelete = false
 		ORDER BY r_p.priority DESC
 		LIMIT ? 
-		OFFSET ?`
+		OFFSET ?
+		`
 		const values = [id, pageSize, offset]
 		const rowsQuery = (await connection).query(sql, values)
 		const [rows] = await rowsQuery
@@ -58,11 +64,10 @@ export const addRelate = async (req: Request, res: Response) => {
 
 export const removeRelatedProduct = async (req: Request, res: Response) => {
 	try {
-		const { id } = req.params
+		const { id, related_product_id } = req.params
 		if (!id) {
 			return res.status(STATUS.NOT_FOUND).json('ID is required')
 		}
-		const { related_product_id } = req.body
 		if (!related_product_id) {
 			return res.status(STATUS.BAD_REQUEST).json('Related product ID is required')
 		}

@@ -1,3 +1,4 @@
+import { SELECT_CLASS_NAME } from '@/commons/getToken'
 import { IUser } from '@/types/IUser'
 import {
 	CarOutlined,
@@ -91,8 +92,7 @@ export const OrderList = () => {
 		const user = usersData?.data.find(user => user.id === userId)
 		return user?.username ?? userId
 	}
-	const selectClassName =
-		'w-full bg-white dark:bg-black p-2 transition-all duration-300 rounded border border-black dark:border-white capitalize'
+
 	const updateStatus = (record: BaseRecord, status: string) => {
 		updateStatusMutation({
 			id: record.id,
@@ -105,7 +105,7 @@ export const OrderList = () => {
 		<List canCreate={false}>
 			<Form layout='horizontal' className='grid grid-cols-3 gap-4'>
 				<Form.Item label='Status' className='col-span-1'>
-					<select name='status' id='' className={selectClassName} onChange={e => filterByStatus(e.target.value)}>
+					<select name='status' id='' className={SELECT_CLASS_NAME} onChange={e => filterByStatus(e.target.value)}>
 						<option value=''>All</option>
 						{statusOptions?.map((option: any) => (
 							<option key={option.value} value={option.value}>
@@ -115,7 +115,7 @@ export const OrderList = () => {
 					</select>
 				</Form.Item>
 				<Form.Item label='User'>
-					<select name='userId' id='' className={selectClassName} onChange={e => filterByUser(+e.target.value)}>
+					<select name='userId' id='' className={SELECT_CLASS_NAME} onChange={e => filterByUser(+e.target.value)}>
 						<option value={0}>All</option>
 						{usersData?.data.map((user: IUser) => (
 							<option key={user.id} value={user.id}>

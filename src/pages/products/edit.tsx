@@ -1,11 +1,12 @@
 import { MAX_PRODUCT_IMAGE_COUNT } from '@/commons/constants'
+import { SELECT_CLASS_NAME } from '@/commons/getToken'
 import BooleanField from '@/components/BooleanField'
 import DeleteButton from '@/components/DeleteButton'
 import { DoubleRightOutlined, FileImageOutlined, SyncOutlined } from '@ant-design/icons'
 import { CreateButton, Edit, EditButton, useForm, useSelect } from '@refinedev/antd'
 import { BaseRecord, useCreate, useDelete, useList } from '@refinedev/core'
 import { axiosInstance } from '@refinedev/simple-rest'
-import { Button, Flex, Form, Image, Input, InputNumber, Modal, Select, Space, Switch, Table } from 'antd'
+import { Button, Flex, Form, Image, Input, InputNumber, Modal, Space, Switch, Table } from 'antd'
 import FormItemLabel from 'antd/es/form/FormItemLabel'
 import TextArea from 'antd/es/input/TextArea'
 import React, { useEffect, useState } from 'react'
@@ -129,7 +130,7 @@ export const ProductEdit = () => {
 				<div className='flex justify-end items-center my-2 gap-4'>
 					{/* length */}
 					<p className='text-md font-bold'>
-						{images.length}/${MAX_PRODUCT_IMAGE_COUNT}
+						{images.length}/{MAX_PRODUCT_IMAGE_COUNT}
 					</p>
 					<CreateButton
 						href={'/products/' + id + '/images/create'}
@@ -225,7 +226,13 @@ export const ProductEdit = () => {
 					<Input />
 				</Form.Item>
 				<Form.Item label='Category' name={['category_id']}>
-					<Select {...selectProps} />
+					<select className={SELECT_CLASS_NAME}>
+						{selectProps.options?.map(option => (
+							<option key={option.value} value={option.value?.toString()}>
+								{option.label}
+							</option>
+						))}
+					</select>{' '}
 				</Form.Item>
 				<Flex gap={8} align='center'>
 					<FormItemLabel label={'Best sale'} prefixCls=''></FormItemLabel>

@@ -41,17 +41,12 @@ export const CategoryCreate = () => {
 					<Form.Item
 						label={''}
 						name={['isNewArrival']}
-						rules={[
-							{
-								required: true,
-							},
-						]}
 						style={{
 							marginBottom: 0,
 							marginTop: 4,
 						}}
 						valuePropName='checked'>
-						<Input type='checkbox' />
+						<Input type='checkbox' defaultChecked={false} />
 					</Form.Item>
 				</Flex>
 				<Upload form={formProps.form} onUploadSuccess={handleUploadSuccess} />

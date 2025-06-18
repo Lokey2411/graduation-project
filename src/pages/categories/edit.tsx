@@ -41,11 +41,6 @@ export const CategoryEdit = () => {
 					<Form.Item
 						label={''}
 						name={['isNewArrival']}
-						rules={[
-							{
-								required: true,
-							},
-						]}
 						style={{
 							marginBottom: 0,
 							marginTop: 4,

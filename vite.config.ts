@@ -8,7 +8,7 @@ export default defineConfig({
 		port: 3000,
 		proxy: {
 			'/services/api': {
-				target: 'http://localhost:8000',
+				target: 'https://graduation-project-be-pearl.vercel.app',
 				changeOrigin: true,
 				secure: false,
 			},

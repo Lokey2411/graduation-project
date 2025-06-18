@@ -1,5 +1,6 @@
+import { SELECT_CLASS_NAME } from '@/commons/getToken'
 import { Create, useForm, useSelect } from '@refinedev/antd'
-import { Flex, Form, Input, InputNumber, Select } from 'antd'
+import { Flex, Form, Input, InputNumber } from 'antd'
 import FormItemLabel from 'antd/es/form/FormItemLabel'
 import TextArea from 'antd/es/input/TextArea'
 
@@ -50,7 +51,13 @@ export const ProductCreate = () => {
 					<Input />
 				</Form.Item>
 				<Form.Item label='Category' name={['category_id']}>
-					<Select {...selectProps} />
+					<select className={SELECT_CLASS_NAME}>
+						{selectProps.options?.map(option => (
+							<option key={option.value} value={option.value?.toString()}>
+								{option.label}
+							</option>
+						))}
+					</select>
 				</Form.Item>
 				<Flex gap={8} align='center'>
 					<FormItemLabel label={'Best sale'} prefixCls=''></FormItemLabel>

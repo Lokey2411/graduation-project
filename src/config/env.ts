@@ -1,5 +1,7 @@
 import dotenv from 'dotenv'
-dotenv.config()
+
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
+dotenv.config({ path: envFile })
 
 export const MYSQL_HOST = process.env.MYSQL_HOST || 'localhost'
 export const MYSQL_PORT = +process.env.MYSQL_PORT || 3306

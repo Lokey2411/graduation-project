@@ -1,6 +1,6 @@
 import { STATUS } from '@/constants'
 import { Request, Response } from 'express'
-import connection from './../../config/db'
+import connection from '@/config/db'
 
 export const addVariant = async (req: Request, res: Response) => {
 	try {

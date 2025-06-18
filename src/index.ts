@@ -12,6 +12,27 @@ import upload from './config/upload.config'
 const app = express()
 app.use(bodyParser.json())
 
+const UPLOAD_DIR = '/tmp/uploaded_documents'
+
+const ensureUploadDir = async () => {
+	try {
+		fs.mkdirSync(UPLOAD_DIR, { recursive: true })
+	} catch (err) {
+		console.error('Error creating upload directory:', err)
+		throw err
+	}
+}
+
+// Gọi hàm này trước khi khởi động server
+ensureUploadDir()
+	.then(() => {
+		console.log(`Upload directory ${UPLOAD_DIR} ensured`)
+	})
+	.catch(err => {
+		console.error('Failed to ensure upload directory:', err)
+		process.exit(1)
+	})
+
 const uploadHandler = (req: any, res: Response) => {
 	try {
 		if (!req.file) {
@@ -51,8 +72,7 @@ app.post(PREFIX_PATH + '/files', upload.single('document'), (req: Request, res: 
 })
 
 app.get(PREFIX_PATH + '/files', (req, res) => {
-	const directoryPath = './uploaded_documents/'
-	fs.readdir(directoryPath, (err, files) => {
+	fs.readdir(UPLOAD_DIR, (err, files) => {
 		if (err) {
 			return res.status(500).send('Unable to scan directory')
 		}
@@ -68,7 +88,7 @@ app.get(PREFIX_PATH + '/files', (req, res) => {
 
 app.get(PREFIX_PATH + '/files/:filename', (req, res) => {
 	const filename = req.params.filename
-	const filePath = `./uploaded_documents/${filename}`
+	const filePath = `${UPLOAD_DIR}/${filename}`
 	fs.readFile(filePath, 'utf8', (err, data) => {
 		if (err) {
 			return res.status(500).send('Unable to read file')
@@ -79,7 +99,7 @@ app.get(PREFIX_PATH + '/files/:filename', (req, res) => {
 
 app.delete(PREFIX_PATH + '/files/:filename', (req, res) => {
 	const filename = req.params.filename
-	const filePath = `./uploaded_documents/${filename}`
+	const filePath = `${UPLOAD_DIR}/${filename}`
 	fs.unlink(filePath, err => {
 		if (err) {
 			return res.status(500).send('Unable to delete file')

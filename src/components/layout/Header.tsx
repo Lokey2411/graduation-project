@@ -33,7 +33,7 @@ const navigationLabels = [
 	},
 	{
 		path: '/auth',
-		display: 'Sign Up',
+		display: 'Your Account',
 	},
 ];
 
@@ -162,6 +162,7 @@ export default function Header() {
 										className={profileControlClassName}
 										onClick={() => {
 											localStorage.removeItem('token');
+											window.location.reload();
 										}}>
 										Logout
 									</Button>

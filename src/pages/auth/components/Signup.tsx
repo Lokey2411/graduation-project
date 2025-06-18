@@ -70,12 +70,12 @@ export default function SignUp({
 		}
 	};
 	return (
-		<div className='mr-app flex justify-between items-center'>
+		<div className='mr-app flex justify-between items-center gap-12'>
 			<Modal open={loading} footer={null} closable={false} centered className='animate-fly-in grid place-items-center'>
 				<Loading3QuartersOutlined className='animate-spin' />
 			</Modal>
-			<AuthImage className='animate-to-right' />
-			<Flex vertical gap={48} className='animate-to-left'>
+			<AuthImage className='animate-to-right flex-1/2' />
+			<Flex vertical gap={48} className='animate-to-left flex-1/2'>
 				<Flex vertical gap={24}>
 					<h1 className='text-3xl font-medium'>Create an account</h1>
 					<p className='text-base'>Enter your details below</p>

@@ -1,6 +1,6 @@
 import FastDelivery from '@/assets/svg/FastDelivery';
 import Return from '@/assets/svg/Return';
-import ProductList from '@/components/ProductList';
+import withLazyOnScroll from '@/commons/withLazyOnScroll';
 import { useApi } from '@/context/ApiContext';
 import { useGet } from '@/hooks/useGet';
 import { useNotification } from '@/hooks/useNotification';
@@ -14,6 +14,7 @@ import { Breadcrumb, Button, Flex, Image, InputNumber, theme } from 'antd';
 import clsx from 'clsx';
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+const ProductList = withLazyOnScroll(() => import('@/components/ProductList'));
 
 export default function ProductDetailPage() {
 	const { id: productId } = useParams();

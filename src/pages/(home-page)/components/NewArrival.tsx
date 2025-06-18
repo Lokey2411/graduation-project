@@ -25,6 +25,7 @@ export default function NewArrival() {
 									className='size-full! object-cover!'
 									preview={false}
 								/>
+								<div className='bg-[rgba(0,0,0,0.5)] inset-0 absolute'></div>
 								<div className='absolute bottom-8 left-8 text-white flex flex-col gap-4'>
 									<h5>{cat.name}</h5>
 									<p>{cat.description}</p>

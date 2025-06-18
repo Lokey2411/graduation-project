@@ -1,4 +1,4 @@
-import ProductList from '@/components/ProductList';
+import withLazyOnScroll from '@/commons/withLazyOnScroll';
 import { useGet } from '@/hooks/useGet';
 import NotFound from '@/pages/not-found';
 import CategoryService from '@/services/CategoryService';
@@ -6,6 +6,8 @@ import { ICategory } from '@/types/ICategory';
 import { IProduct } from '@/types/IProduct';
 import { Breadcrumb, Button, Result } from 'antd';
 import { Link, useParams } from 'react-router-dom';
+
+const ProductList = withLazyOnScroll(() => import('@/components/ProductList'));
 
 export default function CategoryPage() {
 	const { id } = useParams();

@@ -5,10 +5,15 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [react(), tailwindcss()],
+	build: {
+		chunkSizeWarningLimit: 1500,
+	},
 	server: {
 		proxy: {
 			'/services/api': {
-				target: 'http://localhost:8000',
+				target: 'https://graduation-project-be-pearl.vercel.app',
+				changeOrigin: true,
+				secure: false,
 			},
 		},
 	},

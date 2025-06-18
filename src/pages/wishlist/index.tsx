@@ -1,10 +1,11 @@
-import ProductList from '@/components/ProductList';
+import withLazyOnScroll from '@/commons/withLazyOnScroll';
 import { useApi } from '@/context/ApiContext';
 import ProductService from '@/services/ProductService';
 import { IProduct } from '@/types/IProduct';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+const ProductList = withLazyOnScroll(() => import('@/components/ProductList'));
 export default function WishListPage() {
 	const { wishlist: wishlistProducts } = useApi();
 	// get related product for each product

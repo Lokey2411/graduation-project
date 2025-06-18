@@ -38,7 +38,7 @@ const Login = ({ setIsSignUp }: { readonly setIsSignUp: React.Dispatch<React.Set
 						description: res.data,
 					});
 				}
-				window.location.reload();
+				window.location.href = '/';
 			})
 			.catch(error => {
 				notification.open({
@@ -49,11 +49,11 @@ const Login = ({ setIsSignUp }: { readonly setIsSignUp: React.Dispatch<React.Set
 			.finally(() => setLoading(false));
 	};
 	return (
-		<div className='ml-app flex justify-between items-center'>
+		<div className='ml-app flex justify-between items-center gap-12'>
 			<Modal open={loading} footer={null} closable={false} className='grid place-items-center' centered>
 				<Loading3QuartersOutlined className='animate-spin text-3xl' />
 			</Modal>
-			<Flex vertical gap={48} className='animate-to-left'>
+			<Flex vertical gap={48} className='animate-to-left flex-1/2'>
 				<Flex vertical gap={24}>
 					<h1 className='text-3xl font-medium'>Log in to Exclusive</h1>
 					<p className='text-base'>Enter your details below</p>

@@ -29,7 +29,7 @@ const ProductCard = (product: Props) => {
 				onClick={e => e.stopPropagation()}
 				title={product.name}
 				alt={product.name}
-				src={images[0] ?? IMAGE_PLACEHOLDER}
+				src={images && Array.isArray(images) ? images[0] : IMAGE_PLACEHOLDER}
 				onError={e => (e.currentTarget.src = IMAGE_PLACEHOLDER)}
 				className='size-full aspect-square rounded-lg animate-land-in group-hover:skew-x-6'
 				rootClassName='w-72 bg-secondary-bg rounded-sm'
@@ -41,7 +41,7 @@ const ProductCard = (product: Props) => {
 					{product.name}
 				</div>
 				<div className='text-sm font-semibold text-white! bg-black rounded-full px-3 py-0.5 w-fit group-hover:animate-pulse'>
-					{category.name}
+					{category ? category.name : ''}
 				</div>
 				<div
 					className={clsx('text-sm font-semibold text-secondary-bg-2! group-hover:animate-pulse', {

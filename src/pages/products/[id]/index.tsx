@@ -62,7 +62,7 @@ export default function ProductDetailPage() {
 	const imageNotCurrent = useMemo(() => {
 		return Array.isArray(images) ? images.filter((_, index) => index !== currentImageIndex) : [];
 	}, [images, currentImageIndex]);
-	const currentImage = images[currentImageIndex];
+	const currentImage = images ? images[currentImageIndex] : '';
 	if (!productDetail) return <NotFound />;
 
 	const handleChangeCurrentVariant = (variant: IVariant) => {

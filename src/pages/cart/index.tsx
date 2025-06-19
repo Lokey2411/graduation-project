@@ -40,12 +40,36 @@ export default function CartPage() {
 			return cartQuantity !== quantity;
 		});
 	}, [carts, quantities]);
-	const subtotal = useMemo(
-		() => (carts && Array.isArray(carts) ? carts.reduce((acc, cart) => acc + +cart.orderPrice, 0) : 0),
-		[carts],
-	);
+	const [subtotal, setSubtotal] = useState(0);
+	useEffect(() => {
+		if (carts && Array.isArray(carts)) {
+			setQuantities(
+				carts.reduce(
+					(acc, record) => ({
+						...acc,
+						[record.productOrderId]: record.quantity,
+					}),
+					{},
+				),
+			);
+		}
+	}, [carts]);
+	useEffect(() => {
+		if (carts && Array.isArray(carts)) {
+			setSubtotal(
+				carts.reduce(
+					(acc, record) =>
+						acc + (+record.orderPrice / record.quantity) * (quantities[record.productOrderId] || record.quantity),
+					0,
+				),
+			);
+		}
+	}, [carts, quantities]);
+	useEffect(() => {
+		console.log('Quantities updated', quantities);
+	}, [quantities]);
 	const primaryAddress = useMemo(
-		() => (Array.isArray(addresses) ? addresses.find(address => address.isPrimaryAddress).address : ''),
+		() => (Array.isArray(addresses) ? addresses.find(address => address.isPrimaryAddress)?.address : ''),
 		[addresses],
 	);
 	const tax = useMemo(() => subtotal * 0.1, [subtotal]);
@@ -53,9 +77,6 @@ export default function CartPage() {
 	useEffect(() => {
 		setOrderPrice(total);
 	}, [total]);
-	useEffect(() => {
-		console.log(addresses);
-	}, [addresses]);
 	if (!carts || !Array.isArray(carts) || carts.length === 0)
 		return (
 			<div className='mx-app min-h-screen grid place-items-center'>
@@ -148,7 +169,7 @@ export default function CartPage() {
 						</div>
 					</div>
 				</Modal>
-				<Table dataSource={carts} rowKey='productOrderId'>
+				<Table dataSource={carts} rowKey='productOrderId' key={JSON.stringify(carts)}>
 					<Table.Column
 						title='Product'
 						dataIndex='name'
@@ -180,19 +201,14 @@ export default function CartPage() {
 						dataIndex='actions'
 						render={(_, record) => (
 							<Flex align='center' gap={8}>
+								{record.variant_id}
 								<SaveButton
-									refetch={() => {
-										refetch()
-											.then(() => {
-												window.location.reload();
-											})
-											.catch(console.error);
-									}}
+									refetch={refetch}
 									id={record.orderId}
 									resources='orders/quantity'
 									params={{
-										quantity: quantities[+record.id] ?? record.quantity,
-										product_id: record.product_id,
+										quantity: quantities[+record.productOrderId] ?? record.quantity,
+										productOrderId: record.productOrderId,
 										price: +(+record.price / record.quantity) * (quantities[record.id] || record.quantity),
 									}}
 								/>
@@ -224,6 +240,7 @@ export default function CartPage() {
 							<p>${formatNumber(total)}</p>
 						</div>
 						<CheckoutButton
+							key={total}
 							handleCheckout={() => {
 								setCheckout(true);
 							}}

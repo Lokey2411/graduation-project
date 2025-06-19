@@ -102,8 +102,9 @@ export default function Header() {
 						className='outline-none border bg-transparent  transition-all p-2  rounded'
 						onChange={e => {
 							window.location.href = `/products/${e.target.value}`;
-						}}>
-						<option value='' disabled selected>
+						}}
+						defaultValue={''}>
+						<option value='' disabled>
 							What are you looking for?
 						</option>
 						{Array.isArray(allProducts) &&

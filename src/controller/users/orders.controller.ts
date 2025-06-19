@@ -68,7 +68,7 @@ const getOrCreateOrderId = async (userId: number, price: number) => {
 	const existData = await getDataExist(userId)
 	let orderId = 0
 	if (!Array.isArray(existData) || existData.length === 0) {
-		const sql = `INSERT INTO orders (userId, orderDate, price, status) VALUES (?, ?, ?, ?)`
+		const sql = `INSERT INTO orders (userId, orderDate, price, status, address) VALUES (?, ?, ?, ?, '')`
 		const values = [userId, new Date(), price, ORDER_STATUS.PENDING]
 		let [result] = await (await connection).query(sql, values)
 		if (!('insertId' in result)) {
@@ -165,15 +165,9 @@ export const removeFromCart = async (req: Request, res: Response) => {
 export const updateOrderQuantity = async (req: Request, res: Response) => {
 	try {
 		const { id } = req.params
-		const { quantity, price, product_id } = req.body
+		const { quantity, price, productOrderId } = req.body
 		const [productResult, orderResult] = await Promise.all([
-			(
-				await connection
-			).query(`UPDATE product_orders SET quantity = ? WHERE order_id = ? AND product_id = ?`, [
-				quantity,
-				id,
-				product_id,
-			]),
+			(await connection).query(`UPDATE product_orders SET quantity = ? WHERE  id = ?`, [quantity, productOrderId]),
 			(await connection).query(`UPDATE orders SET price = ? WHERE id = ?`, [price, id]),
 		])
 		const [productUpdate, orderUpdate] = [productResult[0], orderResult[0]]

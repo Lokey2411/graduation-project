@@ -88,7 +88,9 @@ export default function Header() {
 				</Dropdown>
 			</Flex>
 			<Flex className='!pt-10 !pb-4 !px-app bg-white' justify='space-between' align='flex-end'>
-				<h1 className='font-Inter text-2xl font-bold leading-full cursor-pointer '>Exclusive</h1>
+				<Link to='/'>
+					<h1 className='font-Inter text-2xl font-bold leading-full cursor-pointer '>Exclusive</h1>
+				</Link>
 				<div className='self-end w-full flex justify-center'>
 					<Menu
 						items={navigationItems}

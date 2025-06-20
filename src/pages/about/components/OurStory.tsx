@@ -19,11 +19,12 @@ export default function OurStory() {
 						))}
 					</div>
 				</div>
-				<Image
-					src='/static/images/about-side-image.jpg'
-					rootClassName='flex-3/5 animate-to-left'
-					className=' size-full object-cover'
-				/>
+				<div className="flex-3/5 animate-to-left">
+					<Image
+						src='/static/images/about-side-image.jpg'
+						className=' size-full object-cover'
+					/>
+				</div>
 			</Flex>
 		</div>
 	);

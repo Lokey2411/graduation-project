@@ -29,7 +29,7 @@ export default function ContactPage() {
 				import.meta.env.VITE_CONTACT_EMAIL_SERVICE,
 				import.meta.env.VITE_CONTACT_EMAIL_TEMPLATE,
 				{ ...values, reply_to: values.email, to_email: 'hahaiviet24112003@gmail.com' },
-				import.meta.env.VITE_CONTACT_EMAIL_PUBLIC_KEY, // Truyền trực tiếp publicKey dưới dạng string
+				import.meta.env.VITE_CONTACT_EMAIL_PUBLIC_KEY,
 			)
 			.then(res => {
 				if (res.status === 200) {

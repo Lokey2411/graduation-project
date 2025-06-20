@@ -51,7 +51,8 @@ export const ProductCreate = () => {
 					<Input />
 				</Form.Item>
 				<Form.Item label='Category' name={['category_id']}>
-					<select className={SELECT_CLASS_NAME}>
+					<select className={SELECT_CLASS_NAME} value=''>
+						<option value=''>Select Category</option>
 						{selectProps.options?.map(option => (
 							<option key={option.value} value={option.value?.toString()}>
 								{option.label}

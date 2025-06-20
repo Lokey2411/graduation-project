@@ -3,6 +3,7 @@ import Upload from '@/components/Upload'
 import { Create, useForm, useSelect } from '@refinedev/antd'
 import { useCreate, useList } from '@refinedev/core'
 import { Checkbox, Form, Input, Select } from 'antd'
+import { useMemo } from 'react'
 import { useParams } from 'react-router'
 
 export const ImageCreate = () => {
@@ -11,6 +12,11 @@ export const ImageCreate = () => {
 	const resource = `products/${id}/images`
 	const { mutate: saveData } = useCreate({
 		resource,
+		mutationOptions: {
+			onSuccess: () => {
+				window.location.href = '/products/edit/' + id
+			},
+		},
 	})
 	const { data } = useList({
 		resource,
@@ -21,6 +27,11 @@ export const ImageCreate = () => {
 		optionValue: 'id',
 		defaultValue: id ?? 0,
 	})
+	const hasPrimaryImage = useMemo(() => {
+		if (!data?.data) return false
+		return data.data.some(item => item.isPrimaryImage)
+	}, [data])
+
 	return (
 		<Create saveButtonProps={{ ...saveButtonProps, disabled: (data?.total ?? 0) >= MAX_PRODUCT_IMAGE_COUNT }}>
 			<Form
@@ -46,7 +57,7 @@ export const ImageCreate = () => {
 					<Input />
 				</Form.Item>
 				<Form.Item label='Primary image' layout='horizontal' name={['isPrimaryImage']} valuePropName='checked'>
-					<Checkbox />
+					<Checkbox disabled={hasPrimaryImage} />
 				</Form.Item>
 			</Form>
 		</Create>

@@ -6,7 +6,7 @@ import '@/assets/css/banner.css';
 
 type BannerItem = {
 	title: string;
-	banners: string[];
+	banners: string;
 	hasArrow?: boolean;
 };
 
@@ -17,11 +17,11 @@ const getImages = (folder: string) => {
 };
 
 const bannerItemsLabel: BannerItem[] = [
-	{ title: "Woman's Fashion", banners: getImages('woman fashion'), hasArrow: true },
-	{ title: "Men's Fashion", banners: getImages('man fashion'), hasArrow: true },
-	{ title: 'Electronics', banners: getImages('electronics'), hasArrow: false },
-	{ title: 'Home & Lifestyle', banners: ['https://placehold.co/600x400'], hasArrow: false },
-	{ title: 'Medicine', banners: ['https://placehold.co/600x400'], hasArrow: false },
+	{ title: "Woman's Fashion", banners: 'woman fashion', hasArrow: true },
+	{ title: "Men's Fashion", banners: 'man fashion', hasArrow: true },
+	{ title: 'Electronics', banners: 'electronics', hasArrow: false },
+	{ title: 'Home & Lifestyle', banners: 'home and lifestyle', hasArrow: false },
+	{ title: 'Medicine', banners: 'medicine', hasArrow: false },
 ];
 
 const CategoryMenuItem = ({ title, hasArrow }: { title: string; hasArrow?: boolean }) => (
@@ -35,7 +35,7 @@ const CategoryMenuItem = ({ title, hasArrow }: { title: string; hasArrow?: boole
 
 const bannerItems: MenuProps['items'] = bannerItemsLabel.map(({ title, hasArrow }, index) => ({
 	key: index.toString(),
-	label: <CategoryMenuItem title={title} key={index} hasArrow={hasArrow} />,
+	label: <CategoryMenuItem title={title} key={index + 0} hasArrow={hasArrow} />,
 }));
 
 const Banner = () => {
@@ -43,7 +43,7 @@ const Banner = () => {
 	const currentItem = useMemo(() => bannerItemsLabel[Number(current)], [current]);
 
 	useEffect(() => {
-		if (bannerItems && bannerItems[0]?.key) setCurrent(bannerItems[0].key);
+		if (bannerItems[0]?.key) setCurrent(bannerItems[0].key);
 	}, []);
 
 	if (!bannerItems) return <></>;
@@ -63,16 +63,18 @@ const Banner = () => {
 			/>
 			<div className='flex-4 max-w-4/5 self-end animate-to-left'>
 				<Carousel autoplay autoplaySpeed={3000} draggable dotPosition='bottom' infinite className='banner-carousel'>
-					{currentItem?.banners.map((banner, index) => (
-						<Image
-							preview={false}
-							src={banner}
-							alt='banner'
-							className='size-full object-cover'
-							wrapperClassName='w-full bg-[rgba(0,0,0,0.5)] h-full'
-							key={index}
-						/>
-					))}
+					{currentItem
+						? getImages(currentItem.banners).map((banner, index) => (
+								<Image
+									preview={false}
+									src={banner.replace('/public', '')}
+									alt='banner'
+									className='size-full object-cover'
+									wrapperClassName='w-full bg-[rgba(0,0,0,0.5)] h-full'
+									key={index + 0}
+								/>
+						  ))
+						: null}
 				</Carousel>
 			</div>
 		</Flex>

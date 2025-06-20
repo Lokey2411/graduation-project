@@ -2,7 +2,7 @@ import BooleanField from '@/components/BooleanField'
 import { FileSyncOutlined } from '@ant-design/icons'
 import { List, ShowButton, useTable } from '@refinedev/antd'
 import type { BaseRecord } from '@refinedev/core'
-import { Button, Space, Table } from 'antd'
+import { Space, Table } from 'antd'
 import moment from 'moment'
 
 export const ChatList = () => {
@@ -13,21 +13,14 @@ export const ChatList = () => {
 	return (
 		<List
 			createButtonProps={{
-				title: 'Add new document',
-				children: 'Add new document',
-				href: '/documents/create',
+				type: 'primary',
+				icon: <FileSyncOutlined />,
+				children: 'Manage documents',
+				href: '/documents',
 				onClick: () => {
-					window.location.href = '/documents/create'
+					window.location.href = '/documents'
 				},
-			}}
-			headerButtons={({ defaultButtons }) => (
-				<>
-					{defaultButtons}
-					<Button type='primary' icon={<FileSyncOutlined />} href='/documents'>
-						Manage documents
-					</Button>
-				</>
-			)}>
+			}}>
 			<Table {...tableProps} rowKey='id'>
 				<Table.Column dataIndex='id' title={'ID'} />
 				<Table.Column dataIndex='question' title={'Question'} />

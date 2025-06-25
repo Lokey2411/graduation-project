@@ -1,0 +1,7 @@
+{
+	"watch": ["src", "package.json"],
+	"ext": "ts,json",
+	"exec": "node --loader ts-node/esm src/server.ts",
+	"ignore": [".git", "node_modules"],
+	"delay": "2500"
+}

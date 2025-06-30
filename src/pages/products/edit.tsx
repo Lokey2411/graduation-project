@@ -1,7 +1,7 @@
 import { MAX_PRODUCT_IMAGE_COUNT } from '@/commons/constants'
-import { SELECT_CLASS_NAME } from '@/commons/getToken'
 import BooleanField from '@/components/BooleanField'
 import DeleteButton from '@/components/DeleteButton'
+import Select from '@/components/Select'
 import { DoubleRightOutlined, FileImageOutlined, SyncOutlined } from '@ant-design/icons'
 import { CreateButton, Edit, EditButton, useForm, useSelect } from '@refinedev/antd'
 import { BaseRecord, useCreate, useDelete, useList } from '@refinedev/core'
@@ -225,14 +225,8 @@ export const ProductEdit = () => {
 				<Form.Item label='Price after discount' name='priceAfterDiscount'>
 					<Input />
 				</Form.Item>
-				<Form.Item label='Category' name={['category_id']}>
-					<select className={SELECT_CLASS_NAME}>
-						{selectProps.options?.map(option => (
-							<option key={option.value} value={option.value?.toString()}>
-								{option.label}
-							</option>
-						))}
-					</select>{' '}
+				<Form.Item label='Category' name={['category_id']} rules={[{ required: true }]}>
+					<Select selectProps={selectProps} />
 				</Form.Item>
 				<Flex gap={8} align='center'>
 					<FormItemLabel label={'Best sale'} prefixCls=''></FormItemLabel>

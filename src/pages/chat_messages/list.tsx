@@ -23,10 +23,19 @@ export const ChatList = () => {
 			}}>
 			<Table {...tableProps} rowKey='id'>
 				<Table.Column dataIndex='id' title={'ID'} />
-				<Table.Column dataIndex='question' title={'Question'} />
-				<Table.Column dataIndex='answer' title={'Answer'} render={desc => <p className='line-clamp-2'>{desc}</p>} />
 				<Table.Column
-					dataIndex='created_at'
+					dataIndex='username'
+					title={'User / Session'}
+					render={(username, record) => <span>{record.user_id ? username : record.sessionId}</span>}
+				/>
+				<Table.Column
+					dataIndex='email'
+					title={'Email'}
+					render={email => <p className='line-clamp-2'>{email ?? 'N/A'}</p>}
+				/>
+				<Table.Column dataIndex='messageCount' title={'Message Count'} align='center' />
+				<Table.Column
+					dataIndex='lastMessageTime'
 					title={'Chat at'}
 					align='center'
 					render={date => moment(date).format('YYYY-MM-DD HH:mm:ss')}

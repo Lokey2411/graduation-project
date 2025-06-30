@@ -28,8 +28,3 @@
 .ant-form-item-control-input {
 	min-height: unset;
 }
-
-.ant-select-dropdown {
-	right: 48px !important;
-	left: auto !important;
-}

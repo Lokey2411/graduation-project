@@ -1,4 +1,4 @@
-import { SELECT_CLASS_NAME } from '@/commons/getToken'
+import Select from '@/components/Select'
 import { IUser } from '@/types/IUser'
 import {
 	CarOutlined,
@@ -8,7 +8,7 @@ import {
 	RollbackOutlined,
 } from '@ant-design/icons'
 import { List, ShowButton, useSelect, useTable } from '@refinedev/antd'
-import { useList, useUpdate, type BaseRecord } from '@refinedev/core'
+import { useUpdate, type BaseRecord } from '@refinedev/core'
 import { Button, Form, Input, Space, Table } from 'antd'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
@@ -28,26 +28,30 @@ export const OrderList = () => {
 	})
 	const { dataSource: tableDataSource } = tableProps
 
-	const { data: usersData } = useList<IUser>({
+	const { selectProps: userSelectProps } = useSelect<IUser>({
 		resource: 'users',
+		optionLabel: 'username',
+		optionValue: 'id',
 	})
 
 	const { mutate: updateStatusMutation } = useUpdate({
 		resource: 'orders',
 	})
 
-	const {
-		selectProps: { options: statusOptions },
-	} = useSelect({
+	const { selectProps } = useSelect({
 		resource: 'orders/statuses',
 		optionLabel: 'status',
 		optionValue: 'status',
 	})
 	const filterByStatus = (status: string) => {
-		setFilters({
-			...defaultFilters,
-			status,
-		})
+		setFilters(
+			status
+				? {
+						...defaultFilters,
+						status,
+				  }
+				: defaultFilters,
+		)
 	}
 
 	const filterByUser = (userId: number) => {
@@ -89,8 +93,8 @@ export const OrderList = () => {
 
 	// Hàm lấy username từ userId
 	const getUsername = (userId: number) => {
-		const user = usersData?.data.find(user => user.id === userId)
-		return user?.username ?? userId
+		const user = userSelectProps?.options?.find(user => user.value === userId)
+		return user?.label ?? userId
 	}
 
 	const updateStatus = (record: BaseRecord, status: string) => {
@@ -105,24 +109,20 @@ export const OrderList = () => {
 		<List canCreate={false}>
 			<Form layout='horizontal' className='grid grid-cols-3 gap-4'>
 				<Form.Item label='Status' className='col-span-1'>
-					<select name='status' id='' className={SELECT_CLASS_NAME} onChange={e => filterByStatus(e.target.value)}>
-						<option value=''>All</option>
-						{statusOptions?.map((option: any) => (
-							<option key={option.value} value={option.value}>
-								{option.label}
-							</option>
-						))}
-					</select>
+					<Select
+						selectProps={selectProps}
+						onChange={value => filterByStatus(value?.toString())}
+						allowClear
+						placeholder='Select status'
+					/>
 				</Form.Item>
 				<Form.Item label='User'>
-					<select name='userId' id='' className={SELECT_CLASS_NAME} onChange={e => filterByUser(+e.target.value)}>
-						<option value={0}>All</option>
-						{usersData?.data.map((user: IUser) => (
-							<option key={user.id} value={user.id}>
-								{user.username}
-							</option>
-						))}
-					</select>
+					<Select
+						selectProps={userSelectProps}
+						allowClear
+						placeholder='Select user'
+						onChange={value => filterByUser(value ? +value : 0)}
+					/>
 				</Form.Item>
 				<Form.Item label='Address'>
 					<Input onChange={e => filterByAddress(e.target.value)} />
@@ -170,7 +170,7 @@ export const OrderList = () => {
 								title='Mark as preparing'
 								onClick={() => updateStatus(record, 'preparing')}></Button>
 							<Button
-								className='border-white text-white'
+								className=' dark:border-blue-300 dark:text-blue-300'
 								size='small'
 								icon={<CarOutlined />}
 								onClick={() => updateStatus(record, 'shipping')}

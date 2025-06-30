@@ -1,37 +1,15 @@
 import express, { Request, Response } from 'express'
-import routers from '@/router'
-import { PREFIX_PATH, STATUS } from './constants'
 import bodyParser from 'body-parser'
-import cloudinaryConfig from './config/cloudinary.config'
+import { PREFIX_PATH, STATUS } from './constants'
 import { requireAdmin, requireLogin } from './middleware/authMiddleware'
 import { refreshToken } from './utils/controller/refreshToken'
 import { asyncHandler } from './middleware/asyncHandler'
 import { getAllPermissions } from './controller/users/permissions.controller'
-import fs from 'fs'
-import upload from './config/upload.config'
+import routers from '@/router'
+import cloudinaryConfig from './config/cloudinary.config'
+
 const app = express()
 app.use(bodyParser.json())
-
-const UPLOAD_DIR = '/tmp/uploaded_documents'
-
-const ensureUploadDir = async () => {
-	try {
-		fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-	} catch (err) {
-		console.error('Error creating upload directory:', err)
-		throw err
-	}
-}
-
-// Gọi hàm này trước khi khởi động server
-ensureUploadDir()
-	.then(() => {
-		console.log(`Upload directory ${UPLOAD_DIR} ensured`)
-	})
-	.catch(err => {
-		console.error('Failed to ensure upload directory:', err)
-		process.exit(1)
-	})
 
 const uploadHandler = (req: any, res: Response) => {
 	try {
@@ -49,8 +27,8 @@ const uploadHandler = (req: any, res: Response) => {
 		res.status(500).json({ error: errorMessage })
 	}
 }
-
 app.post(PREFIX_PATH + '/upload', cloudinaryConfig, uploadHandler)
+
 app.post(PREFIX_PATH + '/check-token', requireLogin, (req: Request, res: Response) => {
 	res.status(STATUS.OK).json('Token is valid')
 })
@@ -62,51 +40,6 @@ app.post(PREFIX_PATH + '/refresh-token', async (req: Request, res: Response) => 
 })
 
 app.get(PREFIX_PATH + '/permissions', requireLogin, requireAdmin, asyncHandler(getAllPermissions))
-
-app.post(PREFIX_PATH + '/files', upload.single('document'), (req: Request, res: Response) => {
-	if (!req.file) {
-		res.status(400).send('No file uploaded')
-		return
-	}
-	res.send({ message: 'File uploaded successfully', filename: req.file.filename })
-})
-
-app.get(PREFIX_PATH + '/files', (req, res) => {
-	fs.readdir(UPLOAD_DIR, (err, files) => {
-		if (err) {
-			return res.status(500).send('Unable to scan directory')
-		}
-		const fileList = files.filter(file => file.endsWith('.txt') || file.endsWith('.docx'))
-		res.json(
-			fileList.map(item => ({
-				name: item,
-				url: `${PREFIX_PATH}/files/${item}`,
-			})),
-		)
-	})
-})
-
-app.get(PREFIX_PATH + '/files/:filename', (req, res) => {
-	const filename = req.params.filename
-	const filePath = `${UPLOAD_DIR}/${filename}`
-	fs.readFile(filePath, 'utf8', (err, data) => {
-		if (err) {
-			return res.status(500).send('Unable to read file')
-		}
-		res.send(data)
-	})
-})
-
-app.delete(PREFIX_PATH + '/files/:filename', (req, res) => {
-	const filename = req.params.filename
-	const filePath = `${UPLOAD_DIR}/${filename}`
-	fs.unlink(filePath, err => {
-		if (err) {
-			return res.status(500).send('Unable to delete file')
-		}
-		res.send('File deleted successfully')
-	})
-})
 
 routers.forEach(router => {
 	app.use(PREFIX_PATH + router.path, router.router)

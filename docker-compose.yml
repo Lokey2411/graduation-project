@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  node-app:
+    build: ./
+    image: node-app
+    ports:
+      - '8000:8000'
+    volumes:
+      - ./shared:/app/shared
+    depends_on:
+      - chatbot
+    environment:
+      - CHATBOT_API_URL=http://chatbot:5000
+  chatbot:
+    build: ./chatbot
+    image: graduation-chatbot
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./shared:/app/shared

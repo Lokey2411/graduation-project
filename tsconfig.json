@@ -3,7 +3,7 @@
 		"module": "commonjs",
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
-		"target": "es6",
+		"target": "es2020",
 		"moduleResolution": "node",
 		"sourceMap": true,
 		"outDir": "dist",
@@ -12,7 +12,7 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["./src"],
+	"include": ["./src", "chatbot/chatbot"],
 	"exclude": ["node_modules", "dist"],
 	"lib": ["es2015"]
 }

@@ -4,6 +4,7 @@ import productRouter from './products.route'
 import authRouter from './auth.route'
 import orderRouter from './orders.route'
 import chatRouter from './chat.route'
+import fileRouter from './files.route'
 const routers = [
 	{
 		path: '/users',
@@ -28,6 +29,10 @@ const routers = [
 	{
 		path: '/chat',
 		router: chatRouter,
+	},
+	{
+		path: '/files',
+		router: fileRouter,
 	},
 ]
 export default routers

@@ -1,3 +1,5 @@
+import path from 'path'
+
 export const PREFIX_PATH = '/services/api'
 export const PORT = 8000
 export const STATUS = {
@@ -27,3 +29,5 @@ export const PRODUCT_ORDERS_STATUS = {
 
 export const MYSQL_LIMIT_RESULT_DEFAULT = 10
 export const MYSQL_LIMIT_RESULT_MAX = 1000
+
+export const ROOT_DIR = process.env.NODE_ENV === 'production' ? '/var/task' : path.join(__dirname, '../')

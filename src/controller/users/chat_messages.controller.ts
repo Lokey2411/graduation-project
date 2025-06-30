@@ -1,39 +1,36 @@
 import { STATUS } from '@/constants'
 import { Request, Response } from 'express'
-import { spawn } from 'child_process'
-import fs from 'fs'
 import connection from '@/config/db'
 import { deleteData } from '@/utils/controller/deleteData'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '@/config/env'
-
+import { apiChatbot } from '@/utils/apiChatbot'
 export const getAllMessages = async (req: Request, res: Response) => {
 	try {
-		const sql = 'SELECT * FROM chat_messages ORDER BY created_at ASC'
+		const sql = `
+			SELECT 
+			MAX(m.id) as id, 
+			m.user_id, 
+			m.sessionId,
+			MAX(m.created_at) as created_at,
+			COALESCE(u.username, m.sessionId) AS username,
+			m.sessionId,
+			COUNT(m.id) AS messageCount,
+			MAX(m.created_at) AS lastMessageTime,
+			u.email
+			FROM 
+			chat_messages m 
+			LEFT JOIN 
+			users u
+			ON m.user_id = u.id
+			AND u.isDelete = false
+			GROUP BY m.user_id, m.sessionId, u.username, u.email
+			ORDER BY lastMessageTime ASC
+		`
 		const [data] = await (await connection).query(sql)
 		return res.status(STATUS.OK).json(data)
 	} catch (error) {
 		console.error('Error fetching message:', error)
-		return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Internal Server Error')
-	}
-}
-
-export const getMessageByUser = async (req: Request, res: Response) => {
-	try {
-		const authHeader = req.headers.authorization
-		const token = authHeader?.split(' ')[1]
-		const decoded = token ? jwt.verify(token.toString(), JWT_SECRET) : { userId: null, username: '' }
-		if (decoded) {
-			req.user = { userId: decoded.userId, username: decoded.username }
-		}
-		const userId = req.user?.userId
-		const sessionId = req.body?.sessionId
-		const sql = `SELECT * FROM chat_messages WHERE (user_id = ? OR sessionId = ?) AND isDelete = false ORDER BY created_at DESC`
-		const values = [userId, sessionId]
-		const [data] = await (await connection).query(sql, values)
-		return res.status(STATUS.OK).json(data)
-	} catch (error) {
-		console.error('Error when adding message:', error)
 		return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Internal Server Error')
 	}
 }
@@ -51,6 +48,26 @@ export const getMessageByUserOrSession = async (req: Request, res: Response) => 
 	}
 }
 
+export const getMessageByUser = async (req: Request, res: Response) => {
+	try {
+		const authHeader = req.headers.authorization
+		const token = authHeader?.split(' ')[1]
+		const decoded = token ? jwt.verify(token.toString(), JWT_SECRET) : { userId: null, username: '' }
+		if (decoded) {
+			req.user = { userId: decoded.userId, username: decoded.username }
+		}
+		const userId = req.user?.userId
+		const sessionId = req.query?.sessionId
+		const sql = `SELECT * FROM chat_messages WHERE (user_id = ? OR sessionId = ?) AND isDelete = false ORDER BY created_at ASC`
+		const values = [userId, sessionId]
+		const [data] = await (await connection).query(sql, values)
+		return res.status(STATUS.OK).json(data)
+	} catch (error) {
+		console.error('Error when adding message:', error)
+		return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Internal Server Error')
+	}
+}
+
 export const chatWithBot = async (req: Request, res: Response) => {
 	try {
 		const authHeader = req.headers.authorization
@@ -61,51 +78,27 @@ export const chatWithBot = async (req: Request, res: Response) => {
 		}
 		const userId = req.user?.userId
 		const { question, sessionId } = req.body
+
 		if (!question) {
-			res.status(400).send('No question provided')
-			return
+			return res.status(400).send('No question provided')
+		}
+		const data = await apiChatbot(`/chat`, 'POST', { question }, {})
+		if (!data?.answer) {
+			return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Internal Server Error')
+		}
+		const answer = data.answer
+		// Ghi vào DB
+		const sql = `INSERT INTO chat_messages (user_id, question, answer, sessionId) VALUES (?, ?, ?, ?)`
+		const values = [userId ?? null, question, answer, sessionId]
+		const [result] = await (await connection).query(sql, values)
+
+		if (result && 'affectedRows' in result && result.affectedRows === 0) {
+			return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Database insert failed')
 		}
 
-		// Kiểm tra thư mục
-		const directoryPath = './uploaded_documents/'
-		if (!fs.existsSync(directoryPath)) {
-			fs.mkdirSync(directoryPath, { recursive: true })
-			res.status(500).send('Directory created, please upload files first.')
-			return
-		}
-
-		const pythonProcess = spawn('python', ['chatbot.py', question], {
-			env: { ...process.env, PYTHONPATH: './' },
-		})
-
-		let output = ''
-		pythonProcess.stdin.write(question + '\n')
-		pythonProcess.stdin.end()
-
-		pythonProcess.stdout.on('data', data => {
-			output += data.toString()
-		})
-
-		pythonProcess.stderr.on('data', data => {
-			console.error(`Python error: ${data}`)
-		})
-
-		pythonProcess.on('close', async code => {
-			if (code === 0) {
-				const sql = `INSERT INTO chat_messages (user_id, question, answer, sessionId) VALUES (?, ?, ?, ?)`
-				const values = [userId ?? null, question, output.trim(), sessionId]
-				const [result] = await (await connection).query(sql, values)
-				if (result && 'affectedRows' in result && result.affectedRows === 0) {
-					// Sửa lỗi chính tả
-					return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Internal Server Error')
-				}
-				return res.status(STATUS.OK).json({ answer: output.trim() })
-			} else {
-				return res.status(STATUS.INTERNAL_SERVER_ERROR).send('Error processing question')
-			}
-		})
+		return res.status(STATUS.OK).json({ answer })
 	} catch (error) {
-		console.error('Error fetching categories:', error)
+		console.error('Error during chatWithBot:', error)
 		return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Internal Server Error')
 	}
 }

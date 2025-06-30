@@ -47,7 +47,7 @@ export const GlobalApiContextProvider = ({ children }: PropsWithChildren) => {
 	const tokenIsValid = !!localStorage.getItem('token');
 	const refetchMessage = () => {
 		makeRequest
-			.get('/users/chat', { data: { sessionId } })
+			.get('/users/chat', { params: { sessionId: sessionId || localStorage.getItem('sessionId') } })
 			.then(res => {
 				if (res.status === 200) {
 					setChatMessages([DEFAULT_MESSAGE, ...res.data]);

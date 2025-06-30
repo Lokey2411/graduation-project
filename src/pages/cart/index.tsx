@@ -13,7 +13,7 @@ import Link from 'antd/es/typography/Link';
 import { useEffect, useMemo, useState } from 'react';
 
 const ProductItem = ({ id, name }: { id: number; name: string }) => {
-	const images = useGet(async () => await ProductService.getProductImages(id));
+	const { data: images } = useGet(async () => await ProductService.getProductImages(id));
 	return (
 		<div className='flex gap-2 items-center'>
 			<Image
@@ -201,7 +201,6 @@ export default function CartPage() {
 						dataIndex='actions'
 						render={(_, record) => (
 							<Flex align='center' gap={8}>
-								{record.variant_id}
 								<SaveButton
 									refetch={refetch}
 									id={record.orderId}

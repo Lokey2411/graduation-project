@@ -1,4 +1,4 @@
-import { Badge, Button, Dropdown, Flex, Menu, MenuProps } from 'antd';
+import { Badge, Button, Dropdown, Flex, Menu, MenuProps, Select } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import {
 	CloseCircleOutlined,
@@ -100,22 +100,32 @@ export default function Header() {
 					/>
 				</div>
 				<Flex gap={24} align='center' className='!py-1'>
-					<select
-						className='outline-none border bg-transparent  transition-all p-2  rounded'
-						onChange={e => {
-							window.location.href = `/products/${e.target.value}`;
+					<Select
+						filterOption={(input, option) => !!option?.label?.toLowerCase().includes(input.toLowerCase())}
+						options={
+							Array.isArray(allProducts)
+								? allProducts.map(prd => ({
+										value: prd.id,
+										label: prd.name,
+								  }))
+								: []
+						}
+						style={{ width: 200 }}
+						dropdownStyle={{
+							left: 0,
+							top: '100%',
+							zIndex: 1000,
 						}}
-						defaultValue={''}>
-						<option value='' disabled>
-							What are you looking for?
-						</option>
-						{Array.isArray(allProducts) &&
-							allProducts.map(prd => (
-								<option key={prd.id} value={prd.id}>
-									{prd.name}
-								</option>
-							))}
-					</select>
+						getPopupContainer={trigger => trigger.parentElement}
+						showSearch
+						onChange={value => {
+							if (value) {
+								window.location.href = `/products/${value}`;
+							}
+						}}
+						placeholder='Search for products'
+					/>
+
 					<Flex gap={16} align='center'>
 						<Link to='/wishlist' className='relative'>
 							<Badge count={wishlistCount}>

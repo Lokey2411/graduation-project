@@ -37,7 +37,30 @@ export default function ContactPage() {
 						message: 'Success',
 						description: 'Send message successfully',
 					});
-					formProps.resetFields();
+					emailjs
+						.send(
+							import.meta.env.VITE_CONTACT_EMAIL_SERVICE,
+							import.meta.env.VITE_CONTACT_EMAIL_REPLY_TEMPLATE,
+							{
+								to_email: values.email,
+								reply_to: 'hahaiviet24112003@gmail.com',
+								name: values.name,
+							},
+							import.meta.env.VITE_CONTACT_EMAIL_PUBLIC_KEY,
+						)
+						.then(res => {
+							if (res.status === 200) {
+								notification.success({
+									message: 'Success',
+									description: 'Send reply message successfully',
+								});
+							} else {
+								notification.error({
+									message: 'Error',
+									description: 'Send reply message failed',
+								});
+							}
+						});
 				} else {
 					notification.error({
 						message: 'Error',

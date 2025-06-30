@@ -23,6 +23,6 @@ export default defineConfig({
 			'@': path.resolve(__dirname, 'src'),
 		},
 	},
-	publicDir: "public",
-	assetsInclude: ['**/*.png']
+	publicDir: 'public',
+	assetsInclude: ['**/*.png'],
 });

@@ -12,7 +12,7 @@ import { IVariant } from '@/types/IVariant';
 import { HeartFilled, HeartOutlined } from '@ant-design/icons';
 import { Breadcrumb, Button, Flex, Image, InputNumber, theme } from 'antd';
 import clsx from 'clsx';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 const ProductList = withLazyOnScroll(() => import('@/components/ProductList'));
 
@@ -56,13 +56,17 @@ export default function ProductDetailPage() {
 	const isFavorited = useMemo(() => {
 		return Array.isArray(favorites) && favorites.some(favorite => favorite.product_id === productDetail.id);
 	}, [favorites]);
-	const [currentImageIndex, setCurrentImageIndex] = useState(0);
+	const [currentImage, setCurrentImage] = useState<string>('');
 	const [quantity, setQuantity] = useState(1);
 	const [currentVariant, setCurrentVariant] = useState<IVariant | null>(null);
 	const imageNotCurrent = useMemo(() => {
-		return Array.isArray(images) ? images.filter((_, index) => index !== currentImageIndex) : [];
-	}, [images, currentImageIndex]);
-	const currentImage = images ? images[currentImageIndex] : '';
+		return Array.isArray(images) ? images.filter(image => image !== currentImage) : [];
+	}, [images, currentImage]);
+	useEffect(() => {
+		if (images && images.length > 0) {
+			setCurrentImage(images[0] ?? '');
+		}
+	}, [images, productDetail]);
 	if (!productDetail) return <NotFound />;
 
 	const handleChangeCurrentVariant = (variant: IVariant) => {
@@ -171,7 +175,7 @@ export default function ProductDetailPage() {
 									rootClassName='size-20 object-cover'
 									className='size-full aspect-square object-cover cursor-pointer hover:animate-pulse'
 									preview={false}
-									onClick={() => setCurrentImageIndex(index)}
+									onClick={() => setCurrentImage(image)}
 								/>
 							))}
 						</Flex>

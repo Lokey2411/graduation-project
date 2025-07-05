@@ -2,7 +2,7 @@ import connection from '@/config/db'
 import { STATUS } from '@/constants'
 import { createData } from '@/utils/controller/createData'
 import { deleteData } from '@/utils/controller/deleteData'
-import { getAllData, getPaginationData } from '@/utils/controller/getAllData'
+import { getAllData } from '@/utils/controller/getAllData'
 import { getDataById } from '@/utils/controller/getDataById'
 import { updateData } from '@/utils/controller/updateData'
 import { Request, Response } from 'express'
@@ -19,8 +19,9 @@ const checkForeignData = async (req: Request, queryData: { category_id: number }
 
 export const getAllProducts = async (req: Request, res: Response) => {
 	try {
-		const { status, data } = await getPaginationData(req, TABLE_NAME)
-		return res.status(status).json(data)
+		const sql = `SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.isDelete = false AND c.isDelete = false`
+		const [data] = await (await connection).query(sql)
+		return res.status(STATUS.OK).json(data)
 	} catch (error) {
 		console.error(ERROR_MESSAGE, error)
 		return res.status(STATUS.INTERNAL_SERVER_ERROR).json('Internal Server Error')

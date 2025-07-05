@@ -1,6 +1,7 @@
 import connection from '@/config/db'
 import { ORDER_STATUS, PRODUCT_ORDERS_STATUS, STATUS } from '@/constants'
 import { getFilteredString } from '@/utils/controller/getFilteredString'
+import axios from 'axios'
 import { Request, Response } from 'express'
 
 const checkForeign = async (productId: number, variantId: number) => {
@@ -297,6 +298,18 @@ export const getProductsByOrderId = async (req: Request, res: Response) => {
 		`
 		const values = [id]
 		const [result] = await (await connection).query(sql, values)
+		if (!Array.isArray(result) || result.length === 0) {
+			return res.status(STATUS.NOT_FOUND).json('No products found for this order')
+		}
+		const images = await Promise.all(
+			result.map(({ id }: any) => {
+				const response = axios.get('http://localhost:8000/services/api/products/' + id + '/images')
+				return response.then(res => res.data[0].imageUrl)
+			}),
+		)
+		result.forEach((item: any, index: number) => {
+			item.image = images[index]
+		})
 		return res.status(STATUS.OK).json(result)
 	} catch (error) {
 		console.error('Error get products by order id', error)

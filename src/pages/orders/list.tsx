@@ -4,14 +4,17 @@ import {
 	CarOutlined,
 	CheckCircleOutlined,
 	CloseCircleOutlined,
+	DollarCircleFilled,
+	FilePdfOutlined,
 	InboxOutlined,
+	Loading3QuartersOutlined,
 	RollbackOutlined,
 } from '@ant-design/icons'
 import { List, ShowButton, useSelect, useTable } from '@refinedev/antd'
 import { useUpdate, type BaseRecord } from '@refinedev/core'
-import { Button, Form, Input, Space, Table } from 'antd'
+import { Button, DatePicker, Form, Input, Space, Statistic, Table } from 'antd'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export const OrderList = () => {
 	const [dataSource, setDataSource] = useState<readonly BaseRecord[]>([])
@@ -96,6 +99,39 @@ export const OrderList = () => {
 		const user = userSelectProps?.options?.find(user => user.value === userId)
 		return user?.label ?? userId
 	}
+	const statistics = useMemo(() => {
+		const revenue = dataSource.reduce((total, order) => total + (order.price ? +order.price : 0), 0)
+		return {
+			Total: { value: dataSource.length, icon: <FilePdfOutlined /> },
+			Revenue: {
+				value: revenue.toLocaleString('en-US', {
+					minimumFractionDigits: 2,
+					maximumFractionDigits: 2,
+				}),
+				icon: <DollarCircleFilled className='text-green-500' />,
+			},
+			Pending: {
+				value: tableDataSource?.filter(order => order.STATUS === 'pending').length ?? 0,
+				icon: <Loading3QuartersOutlined className='text-yellow-500' />,
+			},
+			Preparing: {
+				value: tableDataSource?.filter(order => order.STATUS === 'preparing').length ?? 0,
+				icon: <InboxOutlined />,
+			},
+			Shipping: {
+				value: tableDataSource?.filter(order => order.STATUS === 'shipping').length ?? 0,
+				icon: <CarOutlined className='text-blue-500' />,
+			},
+			Delivered: {
+				value: tableDataSource?.filter(order => order.STATUS === 'delivered').length ?? 0,
+				icon: <CheckCircleOutlined className='text-green-500' />,
+			},
+			Canceled: {
+				value: tableDataSource?.filter(order => order.STATUS === 'canceled').length ?? 0,
+				icon: <CloseCircleOutlined className='text-red-500' />,
+			},
+		}
+	}, [dataSource, tableDataSource])
 
 	const updateStatus = (record: BaseRecord, status: string) => {
 		updateStatusMutation({
@@ -107,6 +143,22 @@ export const OrderList = () => {
 	}
 	return (
 		<List canCreate={false}>
+			<div className='grid grid-cols-5 gap-x-5 gap-y-3 rounded-md p-5 shadow-md bg-white dark:bg-slate-500 mb-8'>
+				{Object.entries(statistics).map(([key, value]) => (
+					<Statistic
+						key={key}
+						title={key}
+						value={value.value}
+						className='flex items-center gap-3 flex-col shadow-md rounded-md p-3 bg-slate-600 text-white overflow-ellipsis overflow-hidden whitespace-nowrap'
+						valueRender={val => (
+							<div className='flex items-center gap-2'>
+								{value.icon}
+								<span className='text-2xl font-bold'>{val}</span>
+							</div>
+						)}
+					/>
+				))}
+			</div>
 			<Form layout='horizontal' className='grid grid-cols-3 gap-4'>
 				<Form.Item label='Status' className='col-span-1'>
 					<Select
@@ -126,6 +178,29 @@ export const OrderList = () => {
 				</Form.Item>
 				<Form.Item label='Address'>
 					<Input onChange={e => filterByAddress(e.target.value)} />
+				</Form.Item>
+				<div className='col-span-2'></div>
+				<Form.Item className='col-span-1'>
+					<DatePicker.RangePicker
+						className='w-full relative'
+						getPopupContainer={trigger => trigger.parentElement || trigger}
+						picker='date'
+						format={'DD/MM/YYYY'}
+						dropdownClassName='!top-full !left-0 absolute'
+						onChange={(value, info) => {
+							const [start, end] = info
+							if (start && end) {
+								const startDate = new Date(start).toISOString()
+								const endDate = new Date(end).toISOString()
+								setDataSource(prevData =>
+									prevData.filter(order => moment(order.orderDate).isBetween(startDate, endDate, undefined, '[]')),
+								)
+							} else {
+								setDataSource(tableDataSource ? [...tableDataSource] : [])
+							}
+						}}
+						placeholder={['Start date', 'End date']}
+					/>
 				</Form.Item>
 			</Form>
 			<Table {...tableProps} rowKey='id' dataSource={dataSource}>

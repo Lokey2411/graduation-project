@@ -1,0 +1,7 @@
+node_modules
+package-lock.json
+.vercel
+dist
+.env.development
+.env.production
+src/uploaded_documents

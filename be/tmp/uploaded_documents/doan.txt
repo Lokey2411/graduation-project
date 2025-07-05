@@ -1,0 +1,4 @@
+Người thực hiện đề tài ||| Hà Hải Việt
+Người Hướng Dẫn ||| PGS.TS Lê Văn Hưng
+Đề tài ||| WEBSITE BÁN HÀNG TÍCH HỢP CHATBOT HỖ TRỢ KHÁCH HÀNG
+Công nghệ sử dụng ||| Reactjs, Nodejs, Expressjs, Refine, Antdesign, tailwindcss, mysql, jwt, bcrypt 

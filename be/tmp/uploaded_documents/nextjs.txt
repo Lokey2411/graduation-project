@@ -1,0 +1,4 @@
+Nextjs là gì? ||| Nextjs là một thư viện của reactjs hỗ trợ ssr
+Nextjs có những điểm cải tiến gì so với reactjs? ||| - Nextjs cho phép người sử dụng cấu trúc thư mục dựa trên router của app một cách tiện lợi
+- Nextjs cho phép người dùng sử dụng ssr
+- Nextjs cho phép người dùng làm back-end trong cùng 1 source

@@ -155,7 +155,7 @@ app.post("/services/api/chat", async (req, res) => {
 });
 loadModel()
 	.then(() => {
-		app.listen(5000, () => {
+		app.listen(5000, "0.0.0.0", () => {
 			console.log("Chatbot server is running on port 5000");
 		});
 	})

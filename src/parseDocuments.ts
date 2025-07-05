@@ -19,6 +19,7 @@ export async function parseDocuments(dir: string): Promise<string[][]> {
 		} else continue;
 		// Tách QA
 		let q = null;
+		console.log(text + "of" + fn);
 		for (const line of text.split(/\r?\n/)) {
 			const t = line.trim();
 			if (t.startsWith("Câu hỏi:")) {

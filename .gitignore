@@ -2,3 +2,5 @@ node_modules
 dist
 vectors
 .vercel
+.github
+fly.toml

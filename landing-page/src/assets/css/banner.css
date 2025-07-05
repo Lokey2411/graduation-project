@@ -1,0 +1,4 @@
+.banner-carousel .slick-slide > div > div {
+	display: flex !important;
+	justify-content: flex-end;
+}

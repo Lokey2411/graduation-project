@@ -1,0 +1,91 @@
+@import 'tailwindcss';
+@config "../../../tailwind.config.ts";
+@import url('./carousel.css');
+@import url('./banner.css');
+
+@layer base {
+	.product-list-carousel .slick-slide {
+		@apply max-h-none;
+	}
+
+	* {
+		@apply transition-all duration-300;
+	}
+}
+
+.contact-message .ant-row {
+	height: 100%;
+}
+
+.contact-message .ant-form-item-control * {
+	height: 100%;
+}
+.ant-popover {
+	inset: auto !important;
+	top: -100% !important;
+	left: 30% !important;
+	transform: translateX(-50%);
+}
+
+@font-face {
+	font-family: 'Inter';
+	src: url('../fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+	font-weight: 100 900;
+	font-display: swap;
+	font-style: normal;
+	unicode-range: U+0000-5FFF, U+E000-FFFF;
+}
+@font-face {
+	font-family: 'Poppins';
+	src: url('../fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+	font-weight: 100 900;
+	font-display: swap;
+	font-style: normal;
+	unicode-range: U+0000-5FFF, U+E000-FFFF;
+}
+
+body {
+	font-family: 'Poppins', sans-serif;
+}
+
+.ant-menu-horizontal {
+	line-height: 1;
+}
+
+.ant-btn {
+	height: auto;
+}
+
+.product-list-carousel .slick-list {
+	padding: 0 !important;
+}
+
+.product-list-carousel .slick-track,
+.category-carousel .slick-track {
+	display: flex !important;
+	gap: 30px;
+}
+.product-list-carousel .slick-slide {
+	width: 288px !important;
+}
+
+.ant-carousel .slick-list .slick-slide {
+	pointer-events: auto;
+}
+
+.typing-dots::after {
+	content: '.';
+	animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+	0% {
+		content: '.';
+	}
+	33% {
+		content: '..';
+	}
+	66% {
+		content: '...';
+	}
+}

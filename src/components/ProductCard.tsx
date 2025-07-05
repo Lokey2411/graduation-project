@@ -6,19 +6,18 @@ import { Image } from 'antd';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 
-type Props = IProduct;
+type Props = IProduct & {
+	categoryName?: string;
+};
 
 const ProductCard = (product: Props) => {
 	const fetchProductData = async () => {
-		const [images, category] = await Promise.all([
-			ProductService.getProductImages(product.id),
-			ProductService.getProductCategory(product.id),
-		]);
-		return { images, category };
+		const [images] = await Promise.all([ProductService.getProductImages(product.id)]);
+		return { images };
 	};
 
 	const {
-		data: { images, category },
+		data: { images },
 	} = useGet(fetchProductData);
 	return (
 		<Link
@@ -41,7 +40,7 @@ const ProductCard = (product: Props) => {
 					{product.name}
 				</div>
 				<div className='text-sm font-semibold text-white! bg-black rounded-full px-3 py-0.5 w-fit group-hover:animate-pulse'>
-					{category ? category.name : ''}
+					{product.categoryName}
 				</div>
 				<div
 					className={clsx('text-sm font-semibold text-secondary-bg-2! group-hover:animate-pulse', {

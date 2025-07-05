@@ -1,6 +1,7 @@
 import CheckoutButton from '@/components/CheckoutButton';
 import DeleteButton from '@/components/DeleteButton';
 import SaveButton from '@/components/SaveButton';
+import Select from '@/components/Select';
 import { useApi } from '@/context/ApiContext';
 import { useGet } from '@/hooks/useGet';
 import { useOrder } from '@/hooks/useOrder';
@@ -77,6 +78,11 @@ export default function CartPage() {
 	useEffect(() => {
 		setOrderPrice(total);
 	}, [total]);
+	useEffect(() => {
+		if (primaryAddress) {
+			setOrderAddress(primaryAddress);
+		}
+	}, [primaryAddress, setOrderAddress]);
 	if (!carts || !Array.isArray(carts) || carts.length === 0)
 		return (
 			<div className='mx-app min-h-screen grid place-items-center'>
@@ -84,7 +90,6 @@ export default function CartPage() {
 			</div>
 		);
 	const formatNumber = (value: number) => `${value.toFixed(2)}`;
-
 	// Handle quantity change for a specific row
 	const handleQuantityChange = (id: number, value: number) => {
 		setQuantities(prev => ({
@@ -153,18 +158,22 @@ export default function CartPage() {
 							<Divider />
 							<FormItemLabel prefixCls='' label='Choose your address' />
 							{Array.isArray(addresses) && (
-								<div className='relative w-full col-span-2 custom-select'>
-									<select
-										className=' rounded border border-black'
-										defaultValue={primaryAddress}
-										onChange={e => setOrderAddress(e.target.value)}>
-										{addresses?.map(address => (
-											<option key={address.id} value={address.address}>
-												{address.address}
-											</option>
-										))}
-									</select>
-								</div>
+								// <div className='relative w-full col-span-2 custom-select'>
+								// 	<select
+								// 		className=' rounded border border-black'
+								// 		defaultValue={primaryAddress}
+								// 		onChange={e => setOrderAddress(e.target.value)}>
+								// 		{addresses?.map(address => (
+								// 			<option key={address.id} value={address.address}>
+								// 				{address.address}
+								// 			</option>
+								// 		))}
+								// 	</select>
+								// </div>
+								<Select
+									defaultValue={primaryAddress}
+									onChange={value => setOrderAddress(value)}
+									options={addresses.map(address => ({ value: address.address, label: address.address }))}></Select>
 							)}
 						</div>
 					</div>

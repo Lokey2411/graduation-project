@@ -1,7 +1,5 @@
 import { IMAGE_PLACEHOLDER } from '@/commons/constansts';
 import withLazyOnScroll from '@/commons/withLazyOnScroll';
-import { useGet } from '@/hooks/useGet';
-import CategoryService from '@/services/CategoryService';
 import { ICategory } from '@/types/ICategory';
 import { Carousel, Flex, Image, Skeleton } from 'antd';
 import { CarouselRef } from 'antd/es/carousel';
@@ -9,8 +7,7 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 const NameField = withLazyOnScroll(() => import('@/components/NameField'));
 
-export default function CategoryList() {
-	const { data: allCategories } = useGet<ICategory[]>(CategoryService.getCategories);
+export default function CategoryList({ allCategories }: { readonly allCategories?: ICategory[] }) {
 	const categoryCarouselRef = useRef<CarouselRef>(null);
 	if (!allCategories || !Array.isArray(allCategories)) return <Skeleton active />;
 	return (

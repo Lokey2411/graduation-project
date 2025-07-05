@@ -1,5 +1,8 @@
 import withLazyOnScroll from '@/commons/withLazyOnScroll';
 import { useApi } from '@/context/ApiContext';
+import { useGet } from '@/hooks/useGet';
+import CategoryService from '@/services/CategoryService';
+import { ICategory } from '@/types/ICategory';
 import { Flex, Skeleton, Statistic } from 'antd';
 
 const ProductList = withLazyOnScroll(() => import('@/components/ProductList'));
@@ -20,6 +23,7 @@ const Countdown = () => {
 
 export default function HomePage() {
 	const { allProducts } = useApi();
+	const { data: allCategories } = useGet<ICategory[]>(CategoryService.getCategories);
 	if (!allProducts || !Array.isArray(allProducts)) return <Skeleton active />;
 	return (
 		<>
@@ -28,12 +32,13 @@ export default function HomePage() {
 				<ProductList
 					title='Flash Sales'
 					control={<Countdown />}
-					products={allProducts.filter(item => item.discount)}
+					products={allProducts.filter(item => !!item.discount)}
 					viewAllPosition='bottom'
+					carouselProps={{ variableWidth: true }}
 					name="Today's"
 				/>
 			</Flex>
-			<CategoryList />
+			<CategoryList allCategories={allCategories} />
 			<div className='py-18'>
 				<ProductList
 					name='This month'
@@ -42,7 +47,7 @@ export default function HomePage() {
 					viewAllPosition='top'
 				/>
 			</div>
-			<NewArrival />
+			<NewArrival allCategories={allCategories} />
 			<div className='py-18'>
 				<ProductList name='This month' title='Best Selling Products' products={allProducts} viewAllPosition='bottom' />
 			</div>

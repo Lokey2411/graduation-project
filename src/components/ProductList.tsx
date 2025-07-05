@@ -1,7 +1,7 @@
 import { IProduct } from '@/types/IProduct';
 import { Carousel, Flex } from 'antd';
 import { CarouselProps, CarouselRef } from 'antd/es/carousel';
-import React from 'react';
+import React, { memo } from 'react';
 import withLazyOnScroll from '@/commons/withLazyOnScroll';
 import ViewAllButton from './ViewAllButton';
 
@@ -24,6 +24,30 @@ const ProductList = ({
 	carouselProps?: CarouselProps;
 }) => {
 	const carouselRef = React.useRef<CarouselRef>(null);
+	const [ready, setReady] = React.useState(false);
+
+	// Đợi tất cả product card render xong
+	React.useEffect(() => {
+		const timeout = setTimeout(() => {
+			setReady(true);
+		}, 500); // Delay để lazy-load kịp (tùy anh chỉnh)
+
+		return () => clearTimeout(timeout);
+	}, [products.length]);
+
+	// Sau khi ready, reset vị trí scroll
+	React.useEffect(() => {
+		if (ready && carouselRef.current) {
+			// react-slick gọi gốc là slickGoTo
+			try {
+				carouselRef.current.goTo?.(0, false);
+			} catch (e) {
+				// fallback nếu API khác
+				console.log(e);
+				carouselRef.current.goTo?.(0, false);
+			}
+		}
+	}, [ready]);
 
 	return (
 		<div className='mx-app'>
@@ -40,7 +64,7 @@ const ProductList = ({
 				/>
 
 				{viewAllPosition === 'top' || viewAllPosition === 'hide' ? (
-					<div className=' flex gap-7'>
+					<div className=' grid grid-cols-4 gap-7'>
 						{products.map(product => (
 							<ProductCard key={product.id} {...product} />
 						))}
@@ -51,7 +75,6 @@ const ProductList = ({
 							<Carousel
 								ref={carouselRef}
 								dots={false}
-								waitForAnimate
 								draggable
 								variableWidth
 								style={{
@@ -75,4 +98,4 @@ const ProductList = ({
 	);
 };
 
-export default ProductList;
+export default memo(ProductList);

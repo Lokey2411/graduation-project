@@ -1,13 +1,10 @@
 import { IMAGE_PLACEHOLDER } from '@/commons/constansts';
 import NameField from '@/components/NameField';
-import { useGet } from '@/hooks/useGet';
-import CategoryService from '@/services/CategoryService';
 import { ICategory } from '@/types/ICategory';
 import { Flex, Image, Skeleton } from 'antd';
 import { Link } from 'react-router-dom';
 
-export default function NewArrival() {
-	const { data: allCategories } = useGet<ICategory[]>(CategoryService.getCategories);
+export default function NewArrival({ allCategories }: { readonly allCategories?: ICategory[] }) {
 	if (!allCategories || !Array.isArray(allCategories)) return <Skeleton active />;
 	return (
 		<div className='mx-app border-y border-gray-400 py-16'>

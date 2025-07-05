@@ -65,6 +65,9 @@ body {
 	display: flex !important;
 	gap: 30px;
 }
+.product-list-carousel .slick-slide {
+	width: 288px !important;
+}
 
 .ant-carousel .slick-list .slick-slide {
 	pointer-events: auto;

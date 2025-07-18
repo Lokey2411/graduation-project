@@ -1,24 +1,42 @@
-process.env.TRANSFORMERS_CACHE = "/tmp/transformers_cache";
-import { env, pipeline } from "@xenova/transformers";
+// src/utils/embedding.ts
+import { pipeline, env } from '@xenova/transformers'
+import { Embeddings } from 'langchain/embeddings/base'
 
-// Tắt file system cache và sử dụng browser cache (hoặc không cache)
-env.useFSCache = false;
-env.useBrowserCache = false;
+// Cấu hình lại cache (như cũ)
+process.env.TRANSFORMERS_CACHE = '/tmp/transformers_cache'
+env.useFSCache = false
+env.useBrowserCache = false
 
-let embedder: any = null;
+let embedder: any = null
 
 export async function initEmbedder() {
-	embedder = await pipeline(
-		"feature-extraction",
-		"Xenova/paraphrase-multilingual-MiniLM-L12-v2",
-		{ quantized: false }
-	);
+	if (!embedder) {
+		embedder = await pipeline('feature-extraction', 'Xenova/paraphrase-multilingual-MiniLM-L12-v2', {
+			quantized: false,
+		})
+	}
 }
 
 export async function embed(text: string) {
-	if (!embedder) throw new Error("Embedder chưa init");
-	const out = await embedder(text.toLowerCase(), { pooling: "mean" });
+	if (!embedder) await initEmbedder()
+	const out = await embedder(text.toLowerCase(), { pooling: 'mean' })
+	return Array.from(out[0].data) as number[] // NOSONAR
+}
 
-	//  mảng chứa 1 `Tensor`, lấy `.data` ra Float32Array
-	return Array.from(out[0].data);
+export class CustomXenovaEmbeddings extends Embeddings {
+	async embedQuery(text: string): Promise<number[]> {
+		return embed(text)
+	}
+
+	async embedDocuments(texts: string[]): Promise<number[][]> {
+		if (!embedder) await initEmbedder()
+		const results: number[][] = []
+
+		for (const text of texts) {
+			const out = await embedder(text.toLowerCase(), { pooling: 'mean' })
+			results.push(Array.from(out[0].data))
+		}
+
+		return results
+	}
 }

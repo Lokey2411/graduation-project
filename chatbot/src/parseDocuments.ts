@@ -29,8 +29,8 @@ export async function parseDocuments(dir: string): Promise<string[][]> {
 				pairs.push([q, a]);
 				q = null;
 			} else if (t.includes("|||")) {
-				const [p, a] = t.split("|||").map((s) => s.trim());
-				pairs.push([p, a]);
+				const [q, a] = t.split("|||").map((s) => s.trim());
+				pairs.push([q, a]);
 			}
 		}
 	}
